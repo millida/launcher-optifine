@@ -45,32 +45,37 @@ async function main() {
 
   for (const url of urls) {
     const fileName = url.split("?f=")[1].split("&")[0];
-    
+
     console.log(fileName);
     if (!existsSync(`files/${fileName}`)) {
       const hData = (await axios.get(url)).data;
-    const $1 = cheerio.load(hData);
-    const u = $1("#Download > a").attr("href");
+      const $1 = cheerio.load(hData);
+      const u = $1("#Download > a").attr("href");
       await downloadFile(`${OPTIFINE_URL}/${u}`, `files/${fileName}`);
     }
   }
 
   let manifest = {};
-  const allMcVersions = Array.from(new Set([
-    ...readDir("files")
-    .filter((i) => i !== ".gitkeep" && i !== "manifest.json")
-    .map((i) => i.replaceAll("preview_", ""))
-    .map((i) => i.split("_")[1])
-  ]));
-  console.log(allMcVersions)
-  allMcVersions.forEach(i => manifest[i] = [
-    readDir("files")
-    .filter((j) => j !== ".gitkeep" && j !== "manifest.json")
-    .filter((j) => j.split("_")[1] === i || j.split("_")[2] === i)
-  ])
+  const allMcVersions = Array.from(
+    new Set([
+      ...readDir("files")
+        .filter((i) => i !== ".gitkeep" && i !== "manifest.json")
+        .map((i) => i.replaceAll("preview_", ""))
+        .map((i) => i.split("_")[1]),
+    ]),
+  );
+  console.log(allMcVersions);
+  allMcVersions.forEach((i) =>
+    manifest[i] = [
+      readDir("files")
+        .filter((j) => j !== ".gitkeep" && j !== "manifest.json")
+        .filter((j) => j.split("_")[1] === i || j.split("_")[2] === i),
+    ]
+  );
 
-  writeFile("files/manifest.json", JSON.stringify(manifest, null, 2), {encoding: "utf8"})
-
+  writeFile("files/manifest.json", JSON.stringify(manifest, null, 2), {
+    encoding: "utf8",
+  });
 }
 
 main();

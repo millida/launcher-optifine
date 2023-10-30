@@ -1,0 +1,41 @@
+name: Parse
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18'
+
+      - name: Check if Yarn is installed
+        id: yarn-check
+        run: echo ::set-output name=yarn-installed::$(yarn --version || echo "false")
+
+      - name: Install Yarn if not installed
+        run: |
+          if [[ "${{ steps.yarn-check.outputs.yarn-installed }}" == "false" ]]; then
+            npm install -g yarn
+          fi
+
+      - name: Run parse.js
+        run: node ./parse.js
+
+      - name: Commit and push changes
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Update files
+          commit_user_name: Millida Worker of the year
+          commit_user_email: githubactions@millida.net
+          branch: public
+          create_branch: true
