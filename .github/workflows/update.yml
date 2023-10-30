@@ -2,8 +2,21 @@ name: Parse
 
 on:
   schedule:
-    - cron: '0 0 * * *'
+    - cron: "0 0 * * *"
   workflow_dispatch:
+
+    # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+
+  # Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+  # However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
 
 jobs:
   build:
@@ -12,11 +25,13 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
 
       - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '18'
+          node-version: "18"
 
       - name: Check if Yarn is installed
         id: yarn-check
@@ -29,17 +44,17 @@ jobs:
           fi
       - name: Install modules
         run: yarn
-        
+
       - run: mkdir files
 
       - name: Run parse.js
         run: node ./parse.js
 
-      - name: Commit and push changes
-        uses: stefanzweifel/git-auto-commit-action@v4
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v2
         with:
-          commit_message: Update files
-          commit_user_name: Millida Worker of the year
-          commit_user_email: githubactions@millida.net
-          branch: public
-          create_branch: true
+          # Upload entire repository
+          path: 'files'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
