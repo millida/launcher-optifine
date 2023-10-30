@@ -27,6 +27,9 @@ jobs:
           if [[ "${{ steps.yarn-check.outputs.yarn-installed }}" == "false" ]]; then
             npm install -g yarn
           fi
+      - name: Install modules
+        run: yarn
+        
 
       - name: Run parse.js
         run: node ./parse.js
