@@ -30,6 +30,7 @@ jobs:
       - name: Install modules
         run: yarn
         
+      - run: mkdir files
 
       - name: Run parse.js
         run: node ./parse.js
